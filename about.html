@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Synt4x // About</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --arch-blue: #1793d1;
+      --arch-dark: #121212;
+      --panic-red: #ff3333;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      color: #eee;
+      font-family: 'JetBrains Mono', monospace;
+      overflow-x: hidden;
+      height: 100vh;
+    }
+
+    /* Boot terminal lines */
+    .terminal-line {
+      opacity: 0;
+      margin-bottom: 2px;
+      font-size: 0.9rem;
+    }
+
+    .animate-line {
+      animation: fadeIn 0.1s forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Main UI */
+    #main-ui {
+      display: none;
+      opacity: 0;
+      transition: opacity 1.8s ease-in-out;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1a1b26 0%, #16161e 100%);
+      min-height: 100vh;
+    }
+
+    .glass-bar {
+      background: rgba(26, 27, 38, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .arch-logo {
+      color: var(--arch-blue);
+      filter: drop-shadow(0 0 8px rgba(23, 147, 209, 0.4));
+    }
+
+    .project-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.3s ease;
+    }
+
+    .project-card:hover {
+      border-color: var(--arch-blue);
+      transform: translateY(-5px);
+      background: rgba(23, 147, 209, 0.06);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--arch-blue); }
+
+    /* Aggressive glitch headline */
+    .glitch {
+      position: relative;
+      display: inline-block;
+    }
+
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      opacity: 0.85;
+      pointer-events: none;
+    }
+
+    .glitch::before {
+      transform: translate(-1px, 0);
+      color: rgba(255, 60, 60, 0.85);
+      clip-path: inset(0 0 60% 0);
+      animation: glitchTop 0.22s infinite linear;
+    }
+
+    .glitch::after {
+      transform: translate(1px, 0);
+      color: rgba(255, 255, 255, 0.35);
+      clip-path: inset(55% 0 0 0);
+      animation: glitchBottom 0.18s infinite linear;
+    }
+
+    @keyframes glitchTop {
+      0% { clip-path: inset(0 0 70% 0); transform: translate(-2px, -1px); }
+      50% { clip-path: inset(0 0 40% 0); transform: translate(2px, 0px); }
+      100% { clip-path: inset(0 0 65% 0); transform: translate(-1px, 1px); }
+    }
+
+    @keyframes glitchBottom {
+      0% { clip-path: inset(60% 0 0 0); transform: translate(2px, 1px); }
+      50% { clip-path: inset(45% 0 0 0); transform: translate(-2px, 0px); }
+      100% { clip-path: inset(55% 0 0 0); transform: translate(1px, -1px); }
+    }
+
+    .blink {
+      animation: blinker 0.45s step-start infinite;
+    }
+
+    @keyframes blinker {
+      50% { opacity: 0; }
+    }
+
+    /* subtle aggressive background flare */
+    .flare {
+      position: absolute;
+      inset: -40px;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 22% 28%, rgba(23,147,209,0.18), transparent 46%),
+        radial-gradient(circle at 78% 62%, rgba(255,60,60,0.14), transparent 54%),
+        radial-gradient(circle at 55% 20%, rgba(255,255,255,0.06), transparent 42%);
+      filter: saturate(1.1) contrast(1.05);
+      opacity: 0.9;
+    }
+
+    .scanlines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,0.06) 0px,
+          rgba(255,255,255,0.06) 1px,
+          rgba(0,0,0,0) 3px,
+          rgba(0,0,0,0) 7px
+        );
+      opacity: 0.08;
+      mix-blend-mode: overlay;
+    }
+
+    /* CTA button style */
+    .hard-btn {
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.06);
+      transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+    }
+
+    .hard-btn:hover {
+      background: rgba(255,255,255,0.10);
+      border-color: rgba(255,255,255,0.18);
+      transform: translateY(-1px);
+    }
+
+    .danger-chip {
+      border: 1px solid rgba(255,60,60,0.25);
+      background: rgba(255,60,60,0.08);
+      color: rgba(255,210,210,0.95);
+    }
+
+    .blue-chip {
+      border: 1px solid rgba(23,147,209,0.22);
+      background: rgba(23,147,209,0.10);
+      color: rgba(210,240,255,0.95);
+    }
+
+    #contact-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+    }
+
+    #contact-modal.show {
+      display: flex;
+    }
+
+    .cm-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      transition: opacity 240ms ease;
+    }
+
+    #contact-modal.show .cm-backdrop {
+      opacity: 1;
+    }
+
+    .cm-window {
+      position: relative;
+      width: 100%;
+      max-width: 720px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(26, 27, 38, 0.62);
+      box-shadow: 0 22px 80px rgba(0,0,0,0.65);
+      backdrop-filter: blur(14px);
+      overflow: hidden;
+
+      transform: translateY(14px) scale(0.98);
+      opacity: 0;
+      transition: transform 260ms cubic-bezier(0.2, 0.9, 0.2, 1), opacity 260ms ease;
+    }
+
+    #contact-modal.show .cm-window {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .cm-glow {
+      position: absolute;
+      inset: -40px;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 18% 35%, rgba(255,60,60,0.18), transparent 55%),
+        radial-gradient(circle at 78% 60%, rgba(23,147,209,0.22), transparent 58%),
+        radial-gradient(circle at 55% 10%, rgba(255,255,255,0.06), transparent 52%);
+      opacity: 0.95;
+      filter: saturate(1.15) contrast(1.06);
+    }
+
+    .cm-scan {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,0.06) 0px,
+          rgba(255,255,255,0.06) 1px,
+          rgba(0,0,0,0) 3px,
+          rgba(0,0,0,0) 7px
+        );
+      opacity: 0.10;
+      mix-blend-mode: overlay;
+    }
+
+    .cm-top {
+      position: relative;
+      padding: 18px 18px 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .cm-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .cm-title .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,60,60,0.8);
+      box-shadow: 0 0 12px rgba(255,60,60,0.35);
+      animation: cmPulse 900ms ease-in-out infinite;
+    }
+
+    @keyframes cmPulse {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.25); opacity: 1; }
+    }
+
+    .cm-close {
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.88);
+      transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+    }
+
+    .cm-close:hover {
+      background: rgba(255,255,255,0.10);
+      border-color: rgba(255,255,255,0.18);
+      transform: translateY(-1px);
+    }
+
+    .cm-body {
+      position: relative;
+      padding: 18px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .cm-hint {
+      color: rgba(255,255,255,0.62);
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+
+    .cm-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .cm-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.20);
+      transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .cm-item:hover {
+      transform: translateY(-2px);
+      border-color: rgba(23,147,209,0.35);
+      background: rgba(23,147,209,0.08);
+    }
+
+    .cm-ico {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      box-shadow: inset 0 0 22px rgba(23,147,209,0.08);
+      flex-shrink: 0;
+    }
+
+    .cm-k {
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      color: rgba(255,255,255,0.62);
+    }
+
+    .cm-v {
+      font-size: 14px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.92);
+      margin-top: 2px;
+    }
+
+    .cm-row {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+
+    .cm-arrow {
+      margin-left: auto;
+      opacity: 0.55;
+      transition: opacity 140ms ease, transform 140ms ease;
+    }
+
+    .cm-item:hover .cm-arrow {
+      opacity: 0.9;
+      transform: translateX(2px);
+    }
+
+    .contact-btn {
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      color: rgba(255,255,255,0.92);
+      transition: transform 140ms ease, background 140ms ease, border-color 140ms ease, box-shadow 240ms ease;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+    }
+
+    .contact-btn:hover {
+      background: rgba(23,147,209,0.12);
+      border-color: rgba(23,147,209,0.30);
+      transform: translateY(-2px);
+      box-shadow: 0 18px 60px rgba(0,0,0,0.55);
+    }
+
+    .contact-btn:active {
+      transform: translateY(0px) scale(0.99);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="boot-terminal" class="p-8 leading-relaxed"></div>
+
+  <div id="main-ui" class="pb-20">
+    <header class="fixed top-4 left-0 right-0 z-50 px-4">
+      <div class="max-w-6xl mx-auto glass-bar rounded-full h-12 flex items-center justify-between px-6 shadow-2xl">
+        <div class="flex items-center gap-4">
+          <span class="arch-logo font-bold flex items-center gap-2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2L1 21h22L12 2zm0 3.516L20.297 19H3.703L12 5.516zM11 10v5h2v-5h-2zm0 7v2h2v-2h-2z"/>
+            </svg>
+            Synt4x
+          </span>
+          <nav class="hidden md:flex gap-6 text-sm font-medium opacity-70">
+            <a href="index.html#projects" class="hover:text-blue-400 transition">Проекты</a>
+            <a href="index.html#software" class="hover:text-blue-400 transition">Софт</a>
+            <a href="about.html" class="hover:text-blue-400 transition">Обо мне</a>
+          </nav>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <a href="index.html" class="text-sm font-semibold opacity-80 hover:text-blue-400 transition">На главную</a>
+          <div class="text-sm font-bold opacity-80" id="digital-clock">00:00</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto pt-32 px-6 relative">
+      <div class="flare"></div>
+      <div class="scanlines"></div>
+      <section class="mb-14 relative">
+        <div class="inline-flex items-center gap-2 text-xs px-3 py-1 rounded-full border border-white/10 bg-white/5">
+          <span class="danger-chip text-[10px] px-2 py-0.5 rounded">NO DEFAULTS</span>
+          <span class="blue-chip text-[10px] px-2 py-0.5 rounded">ARCH MODE</span>
+          <span class="opacity-70">about.me</span>
+        </div>
+
+                <h1 class="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-400">
+                    About Me
+                </h1>
+
+        <p class="text-xl text-gray-400 max-w-2xl leading-relaxed">
+          Парсеры, скрипты, фишинги. Only USDT
+        </p>
+
+        <div class="mt-8 flex flex-wrap gap-3">
+          <span class="text-[10px] px-3 py-1 rounded-full border border-white/10 bg-white/5">JavaScript</span>
+          <span class="text-[10px] px-3 py-1 rounded-full border border-white/10 bg-white/5">Linux</span>
+          <span class="text-[10px] px-3 py-1 rounded-full border border-white/10 bg-white/5">Fishing</span>
+          <span class="text-[10px] px-3 py-1 rounded-full border border-white/10 bg-white/5">Bots</span>
+          <span class="text-[10px] px-3 py-1 rounded-full border border-white/10 bg-white/5">Парсеры</span>
+          <span class="text-[10px] px-3 py-1 rounded-full border border-white/10 bg-white/5">CLI/Tools</span>
+        </div>
+
+        <div class="mt-10 flex flex-col sm:flex-row gap-3 relative">
+          <a href="index.html" class="hard-btn rounded-2xl px-5 py-3 inline-flex items-center gap-3">
+            <span class="text-sm font-semibold">Вернуться на главную</span>
+          </a>
+
+          <a href="index.html#projects" class="hard-btn rounded-2xl px-5 py-3 inline-flex items-center gap-3">
+            <span class="text-sm font-semibold">Смотреть проекты</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="mb-16 relative">
+        <div class="flex items-center gap-4 mb-8">
+          <h2 class="text-2xl font-bold">Кто я</h2>
+          <div class="h-px flex-1 bg-white/10"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="project-card p-6 rounded-2xl">
+            <div class="text-blue-400 mb-4">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-bold mb-2">Одержим системой</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">
+              Встает хуй на чистую архитектуру, минимализм и контроль. С хуевым ТЗ - хуевый итог.
+            </p>
+          </div>
+
+          <div class="project-card p-6 rounded-2xl">
+            <div class="text-blue-400 mb-4">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-bold mb-2">С вас USDT на КБ</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">
+              С меня скрипты, боты, парсинг, обработчик логов, автосборки, деплой, мелкие утилиты, админские автоматизации.
+              Сроки и цена зависят от задачи - контакты на главной странице.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-16 relative">
+        <div class="flex items-center gap-4 mb-8">
+          <h2 class="text-2xl font-bold">Что я делаю</h2>
+          <div class="h-px flex-1 bg-white/10"></div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="project-card p-6 rounded-2xl">
+            <div class="text-blue-400 mb-4">
+              <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-bold mb-2">Скрипты и утилиты</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">
+              Командные инструменты, генераторы, чистка и миграция данных, конвертеры и всё.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="text-[10px] px-2 py-0.5 rounded border border-white/10 bg-white/5">CLI</span>
+              <span class="text-[10px] px-2 py-0.5 rounded border border-white/10 bg-white/5">Batch</span>
+              <span class="text-[10px] px-2 py-0.5 rounded border border-white/10 bg-white/5">Automation</span>
+            </div>
+          </div>
+
+          <div class="project-card p-6 rounded-2xl">
+            <div class="text-blue-400 mb-4">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M16 18a4 4 0 0 0-8 0"/><circle cx="12" cy="10" r="4"/><path d="M22 22H2"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-bold mb-2">Боты и интеграции</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">
+              Уведомления, автоответы, связки сервисов, панели управления.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="text-[10px] px-2 py-0.5 rounded border border-white/10 bg-white/5">Webhooks</span>
+              <span class="text-[10px] px-2 py-0.5 rounded border border-white/10 bg-white/5">API</span>
+              <span class="text-[10px] px-2 py-0.5 rounded border border-white/10 bg-white/5">Bots</span>
+            </div>
+          </div>
+
+          <div class="project-card p-6 rounded-2xl">
+            <div class="text-blue-400 mb-4">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M12 3v18"/><path d="M3 12h18"/><path d="M7 7l10 10"/><path d="M17 7L7 17"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-bold mb-2">Рыбалочные сайты</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">
+              Сделаю 1:1, подберу подходящий домен, найду заебатый хост, BITB Attack.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="text-[10px] px-2 py-0.5 rounded border border-white/10 bg-white/5">React</span>
+              <span class="text-[10px] px-2 py-0.5 rounded border border-white/10 bg-white/5">JS</span>
+              <span class="text-[10px] px-2 py-0.5 rounded border border-white/10 bg-white/5">Tools</span>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="mb-20 relative">
+        <div class="project-card p-8 rounded-2xl relative overflow-hidden">
+          <div class="absolute inset-0 pointer-events-none" style="
+            background:
+              radial-gradient(circle at 18% 40%, rgba(255,60,60,0.18), transparent 55%),
+              radial-gradient(circle at 70% 30%, rgba(23,147,209,0.18), transparent 55%);
+            opacity: 0.85;">
+          </div>
+
+          <div class="relative">
+            <div class="text-sm opacity-80 mb-2">Цитата</div>
+            <div class="text-2xl md:text-3xl font-extrabold leading-tight">
+              Совет номер один: чем ходить
+              <span class="text-red-400">побираться и просить деньги</span><span class="text-green-400"> - лучше укради.</span>
+            </div>
+            <p class="mt-4 text-sm text-gray-400 max-w-3xl leading-relaxed">
+              Олег Тиньков. Состояние: 4,7 млрд $
+            </p>
+
+          </div>
+        </div>
+      </section>
+            <div class="mt-6">
+              <button class="contact-btn" onclick="openContactModal()">
+                <span class="inline-flex items-center justify-center w-7 h-7 rounded-xl border border-white/10 bg-white/5">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.9">
+                    <path d="M21 15a4 4 0 0 1-4 4H7l-4 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
+                    <path d="M8 10h8"/><path d="M8 14h6"/>
+                  </svg>
+                </span>
+                Связаться со мной
+              </button>
+            </div>
+      <footer class="max-w-6xl mx-auto px-6 py-12 text-center text-gray-500 text-sm relative">
+        <p>© 2026 Synt4x. Сделано с любовью к свободному ПО.</p>
+        <p class="mt-2">Powered by BlackArch Linux & Caffeine.</p>
+      </footer>
+    </main>
+  </div>
+
+  <div id="contact-modal" aria-hidden="true">
+    <div class="cm-backdrop" onclick="closeContactModal()"></div>
+
+    <div class="cm-window" role="dialog" aria-modal="true" aria-label="Связаться со мной">
+      <div class="cm-glow"></div>
+      <div class="cm-scan"></div>
+
+      <div class="cm-top">
+        <div class="cm-title">
+          <span class="dot"></span>
+          <div>
+            <div class="text-xs opacity-70">arch@synt4x:~$</div>
+            <div class="text-sm font-extrabold tracking-wide">CONTACTS</div>
+          </div>
+        </div>
+        <button class="cm-close" onclick="closeContactModal()">Закрыть</button>
+      </div>
+
+      <div class="cm-body">
+        <div class="cm-hint">Нажми на контакт - откроется ссылка. Esc - закрыть.</div>
+
+        <div class="cm-list">
+          <div class="cm-item" onclick="openLink('https://matrix.to/#/@kyodan:matrix.org')">
+            <div class="cm-ico">
+              <svg width="22" height="22" viewBox="0 0 256 256" fill="none">
+                <path d="M40 32H56V224H40V32Z" fill="rgba(255,255,255,0.85)"/>
+                <path d="M200 32H216V224H200V32Z" fill="rgba(255,255,255,0.85)"/>
+                <path d="M84 88h26c13 0 24 3 31 12 8-10 20-12 32-12 28 0 43 16 43 43v53h-26v-46c0-12-4-19-17-19-14 0-18 10-18 24v41h-26v-46c0-12-4-19-17-19-14 0-18 10-18 24v41H64V88h20v14z"
+                      fill="rgba(23,147,209,0.95)"/>
+              </svg>
+            </div>
+            <div class="cm-row">
+              <div class="cm-k">Matrix (Element)</div>
+              <div class="cm-v">@kyodan:matrix.org</div>
+            </div>
+            <div class="cm-arrow">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M7 17L17 7"/><path d="M8 7h9v9"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="cm-item" onclick="openLink('https://t.me/syntaxlinux')">
+            <div class="cm-ico">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M21.8 4.6 2.7 11.9c-1.3.5-1.3 1.2-.2 1.5l4.9 1.5 1.9 5.9c.2.6.1.8.8.8.6 0 .8-.3 1.1-.6l2.4-2.4 5 3.7c.9.5 1.6.3 1.9-.8l3.2-15.2c.4-1.4-.5-2-1.7-1.4z"
+                      fill="rgba(23,147,209,0.95)"/>
+                <path d="M8.1 14.7 18.8 7.9c.5-.3 1-.1.6.3l-8.7 8.2-.3 3.4c.4 0 .6-.2.9-.5l1.8-1.7"
+                      fill="rgba(255,255,255,0.78)"/>
+              </svg>
+            </div>
+            <div class="cm-row">
+              <div class="cm-k">Telegram</div>
+              <div class="cm-v">@syntaxlinux</div>
+            </div>
+            <div class="cm-arrow">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M7 17L17 7"/><path d="M8 7h9v9"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="cm-item" onclick="openLink('mailto:root@youna.uk')">
+            <div class="cm-ico">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16v16H4z" stroke="rgba(255,255,255,0.55)"/>
+                <path d="M4 6l8 7 8-7" stroke="rgba(23,147,209,0.95)"/>
+                <path d="M4 20l7-7" stroke="rgba(255,255,255,0.30)"/>
+                <path d="M20 20l-7-7" stroke="rgba(255,255,255,0.30)"/>
+              </svg>
+            </div>
+            <div class="cm-row">
+              <div class="cm-k">Mail</div>
+              <div class="cm-v">root@youna.uk</div>
+            </div>
+            <div class="cm-arrow">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M7 17L17 7"/><path d="M8 7h9v9"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const bootMessages = [
+      ":: systemd[1]: Booting minimal profile...",
+      "[  OK  ] Reached target Basic System.",
+      "[  OK  ] Started udev Coldplug all Devices.",
+      "Mounting /home/synt4x...",
+      "Loading user modules...",
+      "Initramfs detection: ARCH LINUX",
+      "[  OK  ] Started Network Manager.",
+      "Starting seat manager...",
+      "[  OK  ] Started Session 1 of user synt4x.",
+      "Applying theme tokens...",
+      "Checking integrity: /etc, /usr, /home",
+      "INFO: no telemetry enabled",
+      "Loading about: profile manifest...",
+      "Injecting UI: glassbar, flare, scanlines",
+      "[  OK  ] Ready."
+    ];
+
+    const terminal = document.getElementById('boot-terminal');
+    const mainUI = document.getElementById('main-ui');
+    const clockElement = document.getElementById('digital-clock');
+
+    let currentLine = 0;
+
+    function printLine() {
+      if (currentLine < bootMessages.length) {
+        const line = document.createElement('div');
+        line.className = 'terminal-line animate-line';
+        line.textContent = bootMessages[currentLine];
+
+        const msg = bootMessages[currentLine];
+        if (msg.includes('ERROR') || msg.includes('CRITICAL') || msg.includes('FATAL')) {
+          line.classList.add('text-red-500');
+        } else if (msg.includes('WARNING')) {
+          line.classList.add('text-yellow-400');
+        } else if (msg.includes('INFO')) {
+          line.classList.add('text-blue-300');
+        }
+
+        terminal.appendChild(line);
+        currentLine++;
+        window.scrollTo(0, document.body.scrollHeight);
+
+        const base = Math.random() * 140 + 35;
+        setTimeout(printLine, base);
+      } else {
+        showMainUI();
+      }
+    }
+
+    function showMainUI() {
+      terminal.style.display = 'none';
+      mainUI.style.display = 'block';
+      setTimeout(() => { mainUI.style.opacity = '1'; }, 50);
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const time = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+      clockElement.textContent = time;
+    }
+
+    const contactModal = document.getElementById('contact-modal');
+    let lastActiveEl = null;
+
+    function openContactModal() {
+      lastActiveEl = document.activeElement;
+      contactModal.classList.add('show');
+      contactModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeContactModal() {
+      contactModal.classList.remove('show');
+      contactModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (lastActiveEl && typeof lastActiveEl.focus === 'function') lastActiveEl.focus();
+    }
+
+    function openLink(url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && contactModal.classList.contains('show')) {
+        closeContactModal();
+      }
+    });
+
+    window.onload = () => {
+      setInterval(updateClock, 1000);
+      updateClock();
+      printLine();
+    };
+  </script>
+</body>
+</html>
